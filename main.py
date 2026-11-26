@@ -7,7 +7,7 @@ import os
 def limpar_tela():
    os.system("cls" if os.name == "nt" else "clear")
 
-matriz_tabuleiro = tabuleiro.criar_tabuleiro()
+matriz_tabuleiro = tabuleiro.criacao_tabuleiro()
 turno = "b"
 mensagem = ""
 
@@ -24,25 +24,15 @@ while True:
    x2 = int(input("DESTINO(X): "))
    y2 = int(input("DESTINO(Y): "))
 
-   if not tabuleiro.posicao_valida(x1, y1, x2, y2, matriz_tabuleiro):
+   if not (tabuleiro.posicao_valida(x1, y1) and tabuleiro.posicao_valida(x2, y2)):
       mensagem = "Posição inválida."
       continue
 
-   if not peao.controlar_turno(x1, y1, matriz_tabuleiro, turno):
+   if not peao.controlar_turno((x1, y1), matriz_tabuleiro, turno):
       mensagem = "Essa peça não é sua."
       continue
 
-   movimentos = {
-      "t": pecas_linha.movimento_torre,
-      "c": capturas.movimento_cavalo,
-      "b": pecas_linha.movimento_bispo,
-      "q": pecas_linha.movimento_dama,
-      "k": capturas.movimento_rei,
-      "p": peao.movimento_peao,
-   }
-
-   peca = matriz_tabuleiro[x1-1][y1-1][0]
-   if movimentos[peca](x1, y1, x2, y2, matriz_tabuleiro):
+   if peao.executa_movimento((x1, y1), (x2, y2), matriz_tabuleiro):
       turno = peao.trocar_turno(turno)
    else:
       mensagem = "Movimento inválido!"
