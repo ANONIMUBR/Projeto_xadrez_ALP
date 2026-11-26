@@ -1,46 +1,66 @@
+import tabuleiro
+import pecas_linha
+
 # Movimento do Rei
-def movimento_rei(origem, destino):
+def movimento_rei(origem, destino, tab):
     """
-    Verifica se o rei pode se movimentar da posição de origem
-    até a posição de destino, seguindo as regras do jogo.
+    Valida e executa o movimento (e eventual captura) do rei no tabuleiro.
 
     Parâmetros:
-        origem: posição inicial do rei no tabuleiro.
-        destino: posição para onde o rei deseja se mover.
+        origem: posição inicial do rei no tabuleiro (linha, coluna).
+        destino: posição para onde o rei deseja se mover (linha, coluna).
+        tab: tabuleiro onde estão as peças.
 
     Retorno:
-        True se o movimento for válido ou False caso contrário.
+        True se o movimento for realizado ou False caso contrário.
     """
-    if not dentro_tabuleiro(origem) or not dentro_tabuleiro(destino):
+    if not (tabuleiro.posicao_valida(origem[0], origem[1]) and tabuleiro.posicao_valida(destino[0], destino[1])):
         return False
 
     linha = abs(destino[0] - origem[0])
     coluna = abs(destino[1] - origem[1])
 
-    return (linha <= 1 and coluna <= 1
-            and (linha != 0 or coluna != 0))
+    if (linha <= 1 and coluna <= 1 and (linha != 0 or coluna != 0)
+            and pecas_linha.caminho_livre(origem[0], origem[1], destino[0], destino[1], tab)):
+        if tab[destino[0]-1][destino[1]-1]:
+            if not captura_permitida(origem, destino, tab):
+                return False
+            capturar_peca(origem, destino, tab)
 
+        tabuleiro.mover_peca(origem, destino, tab)
+        return True
+
+    return False
 
 # Movimento do Cavalo
-def movimento_cavalo(origem, destino):
+def movimento_cavalo(origem, destino, tab):
     """
-    Verifica se o cavalo está fazendo o movimento em formato de L.
+    Valida e executa o movimento em L (e eventual captura) do cavalo no tabuleiro.
 
     Parâmetros:
-        origem: posição inicial do cavalo no tabuleiro.
-        destino: posição para onde o cavalo deseja se mover.
+        origem: posição inicial do cavalo no tabuleiro (linha, coluna).
+        destino: posição para onde o cavalo deseja se mover (linha, coluna).
+        tab: tabuleiro onde estão as peças.
 
     Retorno:
-        True se o movimento for válido ou False caso contrário.
+        True se o movimento for realizado ou False caso contrário.
     """
-    if not dentro_tabuleiro(origem) or not dentro_tabuleiro(destino):
+    if not (tabuleiro.posicao_valida(origem[0], origem[1]) and tabuleiro.posicao_valida(destino[0], destino[1])):
         return False
 
     linha = abs(destino[0] - origem[0])
     coluna = abs(destino[1] - origem[1])
 
-    return (linha == 2 and coluna == 1) or (linha == 1 and coluna == 2)
+    if (linha == 2 and coluna == 1) or (linha == 1 and coluna == 2):
+        if tab[destino[0]-1][destino[1]-1]:
+            if not captura_permitida(origem, destino, tab):
+                return False
+            capturar_peca(origem, destino, tab)
 
+        tabuleiro.mover_peca(origem, destino, tab)
+        return True
+
+    return False
 
 # Verifica se as peças são da mesma cor
 def mesma_cor(peca1, peca2):
@@ -54,68 +74,55 @@ def mesma_cor(peca1, peca2):
     Retorno:
         True se as peças forem da mesma cor ou False caso contrário.
     """
-    if peca1 is None or peca2 is None:
+    if not peca1 or not peca2:
         return False
 
-    cor1 = peca1.split("_")[0]
-    cor2 = peca2.split("_")[0]
+    cor1 = "p" if peca1 == peca1.upper() else "b"
+    cor2 = "p" if peca2 == peca2.upper() else "b"
 
     return cor1 == cor2
 
 
 # Verifica se a captura é permitida
-def captura_permitida(tabuleiro, origem, destino):
+def captura_permitida(origem, destino, tab):
     """
     Verifica se uma peça pode capturar outra no tabuleiro.
 
     Parâmetros:
-        tabuleiro: tabuleiro onde estão as peças.
         origem: posição da peça que fará a captura.
         destino: posição da peça que será capturada.
+        tab: tabuleiro onde estão as peças.
 
     Retorno:
         True se a captura puder acontecer ou False caso contrário.
     """
-    if not dentro_tabuleiro(origem) or not dentro_tabuleiro(destino):
+    if not (tabuleiro.posicao_valida(origem[0], origem[1]) and tabuleiro.posicao_valida(destino[0], destino[1])):
         return False
 
-    peca_origem = tabuleiro[origem[0]][origem[1]]
-    peca_destino = tabuleiro[destino[0]][destino[1]]
+    peca_origem = tab[origem[0]-1][origem[1]-1]
+    peca_destino = tab[destino[0]-1][destino[1]-1]
 
-    if peca_origem is None or peca_destino is None:
+    if not peca_origem or not peca_destino:
         return False
 
-    if mesma_cor(peca_origem, peca_destino):
-        return False
-
-    tipo = peca_origem.split("_")[-1]
-
-    if tipo == "rei":
-        return movimento_rei(origem, destino)
-
-    if tipo == "cavalo":
-        return movimento_cavalo(origem, destino)
-
-    return False
+    return not mesma_cor(peca_origem, peca_destino)
 
 
-# Realiza a captura e atualiza o tabuleiro
-def capturar_peca(tabuleiro, origem, destino):
+# Realiza a captura (remove a peça adversária do destino)
+def capturar_peca(origem, destino, tab):
     """
-    Realiza a captura da peça adversária e atualiza o tabuleiro.
+    Remove a peça adversária do destino no tabuleiro, mantendo o mesmo
+    comportamento de captura_peca do Código 2.
 
     Parâmetros:
-        tabuleiro: tabuleiro onde estão as peças.
         origem: posição da peça que fará a captura.
         destino: posição da peça adversária.
+        tab: tabuleiro onde estão as peças.
 
     Retorno:
-        True se a captura for realizada ou False se não for permitida.
+        True se a captura for realizada ou False se as posições forem inválidas.
     """
-    if not captura_permitida(tabuleiro, origem, destino):
+    if not (tabuleiro.posicao_valida(origem[0], origem[1]) and tabuleiro.posicao_valida(destino[0], destino[1])):
         return False
-
-    tabuleiro[destino[0]][destino[1]] = tabuleiro[origem[0]][origem[1]]
-    tabuleiro[origem[0]][origem[1]] = None
-
+    tab[destino[0]-1][destino[1]-1] = ""
     return True
