@@ -1,8 +1,3 @@
-def dentro_tabuleiro(posicao):
-    linha, coluna = posicao
-    return 0 <= linha < 8 and 0 <= coluna < 8
-
-
 # Movimento do Rei
 def movimento_rei(origem, destino):
     if not dentro_tabuleiro(origem) or not dentro_tabuleiro(destino):
@@ -71,17 +66,3 @@ def capturar_peca(tabuleiro, origem, destino):
     tabuleiro[origem[0]][origem[1]] = None
 
     return True
-
-
-# Exemplo simples de teste
-if __name__ == "__main__":
-    tabuleiro = [[None for _ in range(8)] for _ in range(8)]
-    tabuleiro[4][4] = "branco_rei"
-    tabuleiro[5][5] = "preto_cavalo"
-
-    print("Movimento do rei:", movimento_rei((4, 4), (5, 5)))
-    print("Movimento do cavalo:", movimento_cavalo((4, 4), (6, 5)))
-    print("Captura permitida:", captura_permitida(tabuleiro, (4, 4), (5, 5)))
-    print("Captura realizada:", capturar_peca(tabuleiro, (4, 4), (5, 5)))
-    print("Tabuleiro atualizado:", tabuleiro[5][5], tabuleiro[4][4])
-sss
