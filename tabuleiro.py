@@ -1,17 +1,21 @@
 def criacao_tabuleiro() -> list:
-    tabuleiro = [["T", "C", "B", "Q", "K", "B", "C", "T"],
-                 ["P", "P", "P", "P", "P", "P", "P", "P"],
-                 ["", "", "", "", "", "", "", ""],
-                 ["", "", "", "", "", "", "", ""],
-                 ["", "", "", "", "", "", "", ""],
-                 ["", "", "", "", "", "", "", ""],
-                 ["p", "p", "p", "p", "p", "p", "p", "p"],
-                 ["t", "c", "b", "q", "k", "b", "c", "t"]]
+   tabuleiro = [
+      ["T", "C", "B", "Q", "K", "B", "C", "T"],
+      ["P", "P", "P", "P", "P", "P", "P", "P"],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["p", "p", "p", "p", "p", "p", "p", "p"],
+      ["t", "c", "b", "q", "k", "b", "c", "t"]
+   ]
+   return tabuleiro
+   
     
 def mostrar_tabuleiro(tabuleiro: list):
    """PECAS:
       PRETAS: ♜ ♞ ♝ ♛ ♚ ♟ ██
-      BRANCAS: ♖ ♘ ♗ ♕ ♔ ♙ ░░#"""
+      BRANCAS: ♖ ♘ ♗ ♕ ♔ ♙ ░░"""
 
    pecas = {
       "T": "♜ ",
@@ -50,10 +54,10 @@ def posicao_valida(linha_escolhida, coluna_escolhida):
     else:
         return False
 
-def mover_peca(tabuleiro, origem, destino):
-    linha_origem, coluna_origem = origem
-    linha_destino, coluna_destino = destino
+def mover_peca(origem, destino, tabuleiro):
+   linha_origem, coluna_origem = origem
+   linha_destino, coluna_destino = destino
 
-    escolha = tabuleiro[linha_origem][coluna_origem] #lê a posição de origem da peça escolhida
-    tabuleiro[linha_destino][coluna_destino] = escolha #coloca a peça na posição de destino
-    tabuleiro[linha_origem][coluna_origem] = ' ' #esvazia a casa em que estava a peça antes
+   escolha = tabuleiro[linha_origem-1][coluna_origem-1] #lê a posição de origem da peça escolhida
+   tabuleiro[linha_destino-1][coluna_destino-1] = escolha #coloca a peça na posição de destino
+   tabuleiro[linha_origem-1][coluna_origem-1] = "" #esvazia a casa em que estava a peça antes
